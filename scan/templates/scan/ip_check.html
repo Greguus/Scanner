@@ -11,13 +11,36 @@
     <br/>
     <br/>
     <br/>
-    {% if ip_check_field %}
-        <h1 class="display-1 text-center">You checked IP: {{ ip_check_field }}</h1>
-        <ul>
-            {% for i in status %}
-            <h1 class="display-1 text-center">Port {{ i }} is: {{ status }} </h1>
-            {% endfor %}
-        </ul>
+    {% if ip_check_field and no_open == '' %}
+        <h1 class="display-1 text-center">Checking IP: {{ ip_check_field }}</h1>
+        <br/>
+        <br/>
+         {% for ports in port_range %}
+         <div class="display-1 container text-center">
+            <div class="row align-items-start">
+           
+              <div class="col bg-secondary">
+                Port
+              </div>
+              <div class="col bg-secondary">
+                {{ports.port_number}}
+              </div>
+              <div class="col bg-secondary">
+                is
+              </div>
+              <div class="col bg-info">
+                {{ports.port_status}}
+              </div>
+            </div>
+          </div>
+          <h1 class="display-1 text-center">{{ no_open }}</h1>
+          {% endfor %}
+    {% elif no_open%}
+        <h1 class="display-1 text-center">Checking IP: {{ ip_check_field }}</h1>
+        <br/>
+        <div class="display-1 container text-center bg-success">
+            {{ no_open }}
+        </div>
     {% else %}
         <h1 class="display-1 text-center">You did not specify IP!</h1>
 
