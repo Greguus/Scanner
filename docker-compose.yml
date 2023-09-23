@@ -1,0 +1,27 @@
+version: "2.22"
+services:
+  scanner_app:
+    build: .
+    ports:
+      - 8000:80 #mapping port 8000 in case you have a web server running on port 80 (would conflict)
+    image: scanner_app
+    container_name: django_app_scanner
+    depends_on:
+      - db
+      - migration
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=scanner
+      - POSTGRES_USER=django #non-default superuser - refer documentation - MUST match user settings.py
+      - POSTGRES_PASSWORD=django
+    ports:
+      - 5433:5432 #mapping non-default port in case you are running postgresql locally (common in dev)
+    container_name: postgres_for_django
+  migration:
+    image: scanner_app
+    command: python manage.py migrate
+    depends_on:
+      - db
+    restart: on-failure:10 #even though it depends on db it will execute before db finishes initialization
+    # restart on failure is required as migration will fail (due to database still spinning up) initialy and prevent app from starting.

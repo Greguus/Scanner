@@ -80,7 +80,8 @@ DATABASES = {
         'NAME': 'scanner',
         'USER': 'django',
         'PASSWORD': 'django',
-        'HOST': 'localhost',
+        #'HOST': 'localhost', #set to localhost when running locally, not in a docker
+        'HOST': 'db', #db service from docker compose
         'PORT': '5432',
         
     }
@@ -130,4 +131,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Static files
 STATIC_URL = 'static/'
-STATIC_ROOT = '/home/gregrdp/network_storage/scanner/static'
+STATIC_ROOT = '/app/scanner/static'
+# STATIC_ROOT = '/home/gregrdp/network_storage/scanner/static'
