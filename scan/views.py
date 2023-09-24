@@ -1,11 +1,31 @@
 from django.http import HttpResponse
 from django.template import loader
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from socket import *
 import time
-from .models import port_status
+from .models import port_status, ip_results, cidr_table
+from .forms import IpResultsForm, SubnetScan
+import ipaddress
+from django.core.management.base import BaseCommand
+
+
+
+
+
 
 # Create your views here.
+
+#subnet_scan view with form to scan desired subnet
+def subnet_scan(request):
+    form = SubnetScan()
+    return render(request, 'scan/subnet_scan.html', 
+            {'form': form,
+            })
+
+
+
+
+    
 
 # takes IP address from search field in navbar.
 def ip_check(request):
@@ -50,5 +70,6 @@ def port_scan(port_range, ip_check_field):
         
     return (port_range, no_open)
 
+#index page "hello world"
 def index(request):
     return render(request, "scan/index.html",)

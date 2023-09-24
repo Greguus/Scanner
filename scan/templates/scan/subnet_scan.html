@@ -1,0 +1,76 @@
+{% extends "scan/base.html" %}
+
+{% block SubnetScan %}
+    <br/>
+    <h1 class="display-2 text-center">Start your scan:</h1>
+    <form action="{% url "subnet_scan" %}" method="post">
+        {% csrf_token %}
+        <div class="container text-start px-5">
+            <div class="row">
+                <div class="col-2 form-floating gx-1">
+                    <input type="text" class="form-control" id="floatingInput" placeholder="VLAN ID">
+                    <label for="floatingInput">VLAN ID:</label>
+                </div>
+                <div class="col form-floating gx-1">
+                    <input type="text" class="form-control" id="floatingInput" placeholder="Network">
+                    <label for="floatingInput">Network:</label>
+                </div>
+                <div class="col-3 form-floating gx-1">
+                    <div class="input-group mb-3 h-100">
+                        <select name="{{ form.CIDR.name }}" id="{{ form.CIDR.id }}" class="form-control">
+                            {% for choice in form.CIDR.field.choices %}
+                                <option value="{{ choice }}" {% if choice == form.CIDR.value %}selected{% endif %}>{{ choice }}
+                                </option>
+                                
+                            {% endfor %}
+                        </select>
+                        <label class="input-group-text" for="{{ form.CIDR.id_for_label }}">CIDR</label>
+                    </div>
+                </div>
+            
+            </div>
+            <div class="row px-3 p-2">
+              <button class="btn btn-primary" type="button">Scan</button>
+            </div>
+        </div>
+    </form>
+
+    
+{% endblock SubnetScan %}
+
+
+{% block content %}
+{% if 1 == 1 %} {% comment "" %} coditional display of scan results {% endcomment %}
+    <br/>
+    <h1 class="display-2 text-center">Scan results:</h1>
+    <form action="{% url "subnet_scan" %}" method="post">
+        {% csrf_token %}
+        <div class="container text-start px-5">
+            <div class="row">
+                <div class="col-4 form-floating gx-1">
+                    <input type="text" class="form-control" id="floatingInput" placeholder="Hostname">
+                    <label for="floatingInput">Hostname</label>
+                </div>
+                <div class="col-3 form-floating gx-1">
+                    <input type="text" class="form-control" id="floatingInput" placeholder="IP">
+                    <label for="floatingInput">IP</label>
+                </div>
+                <div class="col form-floating gx-1">
+                    <input type="text" class="form-control" id="floatingInput" placeholder="State">
+                    <label for="floatingInput">State</label>
+                </div>
+                <div class="col-2 form-floating me-1">
+                    <div class= "row justify-content-right h-100">
+                        <input type="checkbox" class="btn-check" id="btn-check-2-outlined" checked autocomplete="off">
+                        <label class="btn btn-outline-success btn-lg" for="btn-check-2-outlined">SNMP</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row px-3 p-2">
+              <button class="btn btn-primary" type="button">Search / Filter</button>
+            </div>
+        </div>
+    </form>
+   
+{% endif %}      
+{% endblock content %} 

@@ -80,8 +80,8 @@ DATABASES = {
         'NAME': 'scanner',
         'USER': 'django',
         'PASSWORD': 'django',
-        #'HOST': 'localhost', #set to localhost when running locally, not in a docker
-        'HOST': 'db', #db service from docker compose
+        'HOST': 'localhost', #set to localhost when running locally, not in a docker
+        #'HOST': 'db', #db service from docker compose
         'PORT': '5432',
         
     }
