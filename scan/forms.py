@@ -9,8 +9,8 @@ class IpResultsForm(forms.ModelForm):
 
 #form to scan IP range (based on CIDR or VLAN)
 class SubnetScan(forms.Form):
-    VLAN = forms.CharField(label="VLAN", max_length=4)
+    VLAN = forms.CharField(label="VLAN", max_length=20)
     IP = forms.GenericIPAddressField(label="IP")
-    CIDR_CHOICES = [(f'/{i}') for i in range(0, 33)]  # Generates /0 to /32
+    CIDR_CHOICES = [('/' + str(i), '/' + str(i)) for i in range(0, 33)]  # Generates /0 to /32
     CIDR = forms.ChoiceField(choices=CIDR_CHOICES)
-    
+    scan_btn = forms.CharField()

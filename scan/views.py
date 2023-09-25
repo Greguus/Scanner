@@ -6,11 +6,6 @@ import time
 from .models import port_status, ip_results, cidr_table
 from .forms import IpResultsForm, SubnetScan
 import ipaddress
-from django.core.management.base import BaseCommand
-
-
-
-
 
 
 # Create your views here.
@@ -18,15 +13,62 @@ from django.core.management.base import BaseCommand
 #subnet_scan view with form to scan desired subnet
 def subnet_scan(request):
     form = SubnetScan()
+    if request.method == "POST":
+        form = SubnetScan(request.POST)
+        form.is_valid()
+        vlan_id = form.cleaned_data["VLAN"]
+        ip_network = form.cleaned_data["IP"]
+        cidr = form.cleaned_data["CIDR"]    
+        hosts = check_cidr(cidr)
+        successful_connections =[]
+        state = scan_ips(ip_network, cidr)
+        return render(request, 'scan/subnet_scan.html', 
+                {'vlan_id':vlan_id,
+                'ip_network':ip_network,
+                'cidr': cidr,
+                'hosts':hosts,
+                'form':form,
+                'state': state,
+                'successful_connections': successful_connections,
+                })
     return render(request, 'scan/subnet_scan.html', 
             {'form': form,
             })
 
+#Iterate through all IP addresses in given subnet (cidr)
+def scan_ips(ip_network, cidr):
+    ip_network = ip_network + cidr
+    network = ipaddress.IPv4Network(ip_network, strict=False)
+    successful_connections =[]
+    state = []
+    for ip in network.hosts():
+        ip_address = str(ip)
+        s = socket(AF_INET, SOCK_STREAM)
+        s.settimeout (0.02)
+        #socket to check if port is open      
+        conn = s.connect_ex((ip_address, 80))
+        if(conn == 0):
+            successful_connections.append(ip_address)
+            state.append('active')
+        else:
+            successful_connections.append(ip_address)
+            state.append('inactive')
+        # error handling here?
+        s.close()
+        
+    return (successful_connections, state)
 
+#cidr check and compare value from the form with database, extracting amount of hosts 
+def check_cidr(cidr):
+    cidr_database = cidr_table.objects.all()
+    for cidr_fromdatabase in cidr_database:
+            cidr_value = cidr_fromdatabase.cidr
+            if cidr == cidr_value:
+               return cidr_fromdatabase.noOFhosts
+    return 'Incorrect subnet'    
+            
 
-
-    
-
+ 
 # takes IP address from search field in navbar.
 def ip_check(request):
     if request.method == "POST":
