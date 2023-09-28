@@ -8,9 +8,11 @@
     <br/>
     {% if ip_check_field and no_open == '' %}
         <h1 class="display-1 text-center">Checking IP: {{ ip_check_field }}</h1>
+        </br>
+        <h1 class="display-6 text-center">It took: {{en_time}} seconds!</h1>
         <br/>
         <br/>
-         {% for ports in port_range %}
+         {% for ports in port_scan_results %}
          <div class="display-1 container text-center">
             <div class="row align-items-start">
            
@@ -32,6 +34,8 @@
           {% endfor %}
     {% elif no_open%}
         <h1 class="display-1 text-center">Checking IP: {{ ip_check_field }}</h1>
+        </br>
+        <h1 class="display-6 text-center">It took: {{en_time}} seconds!</h1>
         <br/>
         <div class="display-1 container text-center bg-success">
             {{ no_open }}

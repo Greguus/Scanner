@@ -10,13 +10,22 @@
 
 * scan app with form: VLAN OR (Network AND Subnet(CIDR))
     - results: hostname, vlan, ip, state (ACTIVE, AVAILABLE (inactive) with colors)
+    - filter including SNMP column
+    - recognize/pull hostnames
 
 * build tables
     - locations (buildings, sites, rooms etc)
     - VLANS
-    - 
+    ~~- CIDR~~
+
+
+* deal with 504 gateway timeout
+
 
 * SNMP support
 
+* INPUT VALIDATION
+
+* 
 
 
