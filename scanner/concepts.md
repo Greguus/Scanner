@@ -28,4 +28,5 @@
 
 * 
 
+#Asyncio port scan works but template is fighting back. Rewrite template to display data from the database in sync mode.
 
