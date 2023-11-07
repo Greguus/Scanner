@@ -8,12 +8,14 @@ from .models import port_status, ip_results, cidr_table
 from .forms import IpResultsForm, SubnetScan
 import ipaddress
 import asyncio
+from asgiref.sync import sync_to_async
 from django.template.loader import render_to_string
 
 #Variables
 
 PORT_RANGE = range(1, 1024)
-
+hosts = ''
+cidr = ''
 # Create your views here.
 
 def start_time():
@@ -23,6 +25,7 @@ def start_time():
 def end_time():
     en_time = time.time()
     return (en_time)
+
 
 def clean_database(dt_table):
     non_persistent_table = dt_table.objects.all() #prep database ip_results to store data
@@ -54,6 +57,7 @@ def clean_database(dt_table):
             {'form': form,
             })"""
 
+
 async def subnet_scan(request):
     st_time = start_time()
     form = SubnetScan()
@@ -62,51 +66,44 @@ async def subnet_scan(request):
         form = SubnetScan(request.POST)
         form.is_valid()
         vlan_id = form.cleaned_data["VLAN"]
+        global ip_network
         ip_network = form.cleaned_data["IP"]
+        global cidr
         cidr = form.cleaned_data["CIDR"]
-        hosts = await asyncio.to_thread(check_cidr, cidr)  # Run check_cidr in a thread
+        #hosts = check_cidr(cidr)  # Run check_cidr in a thread
         #state = await asyncio.to_thread(scan_ips, ip_network, cidr, await asyncio.to_thread(clean_database, ip_results))  # Run scan_ips and clean_database in threads
         state = await scan_ips(ip_network, cidr, await asyncio.to_thread(clean_database, ip_results))
+        global en_time
         en_time = round((end_time() - st_time), 3)
 
-        context = {
-            'ip_network': ip_network,
-            'cidr': cidr,
-            'hosts': hosts,
-            'form': form,
-            'state': state,
-            'en_time': en_time,
-        }
-
-        return render(request, 'scan/subnet_scan.html', context)
+        # context = {
+        #     'ip_network': ip_network,
+        #     'cidr': cidr,
+        #     'hosts': hosts,
+        #     'form': form,
+        #     'state': state,
+        #     'en_time': en_time,
+        # }
+        return redirect('subnet_results')
+        #return render(request, 'scan/subnet_scan.html', context)
 
     context = {'form': form}
     return render(request, 'scan/subnet_scan.html', context)
 
-
-
-#Iterate through all IP addresses in given subnet (cidr)
-"""def scan_ips(ip_network, cidr, non_persistent_table):
-    ip_network = ip_network + cidr
-    network = ipaddress.IPv4Network(ip_network, strict=False)
-    for ip in network.hosts():
-        ip_address = str(ip)   
-        for port in PORT_RANGE:
-            #socket to check if port is open
-            s = socket(AF_INET, SOCK_STREAM, 0)
-            s.settimeout (0.002)      
-            conn = s.connect_ex((ip_address, port))
-            if(conn == 0):
-                non_persistent_table = ip_results(IP_address=(ip), ip_state='active')
-                non_persistent_table.save() 
-                break #exit loop first port found open means host is alive
-            elif(conn != 0 and port == 1023):
-                non_persistent_table = ip_results(IP_address=(ip), ip_state='inactive')
-                non_persistent_table.save()
-            # error handling here?
-        s.close()
-    non_persistent_table = ip_results.objects.all()    
-    return (non_persistent_table)"""
+def subnet_results(request):
+    state = ip_results.objects.all().order_by('IP_address')
+    hosts = check_cidr(cidr)
+    form = SubnetScan()
+    
+    context = {
+        'ip_network': ip_network,
+        'cidr': cidr,
+        'hosts': hosts,
+        'state': state,
+        'en_time': en_time,
+        'form': form,
+    }
+    return render(request, 'scan/subnet_results.html', context)
 
 async def check_ip(ip, non_persistent_table):
     for port in PORT_RANGE:
@@ -146,8 +143,8 @@ async def scan_ips(ip_network, cidr, non_persistent_table):
                return cidr_fromdatabase.noOFhosts
     return 'Incorrect subnet'   """ 
 
-async def check_cidr(cidr):
-    cidr_database = await asyncio.to_thread(cidr_table.objects.all)
+def check_cidr(cidr):
+    cidr_database = cidr_table.objects.all()
     for cidr_fromdatabase in cidr_database:
         cidr_value = cidr_fromdatabase.cidr
         if cidr == cidr_value:
@@ -182,7 +179,7 @@ def ip_check(request):
 # takes PORT_RANGE and ip from ip_check function and carries port scan
 def port_scan(PORT_RANGE, ip_check_field): 
     for i in PORT_RANGE:
-        s = socket(AF_INET, SOCK_STREAM)
+        s = socket.socket(AF_INET, SOCK_STREAM)
         s.settimeout (0.03)
         #socket to check if port is open      
         conn = s.connect_ex((ip_check_field, i))

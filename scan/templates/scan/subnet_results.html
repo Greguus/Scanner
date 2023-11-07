@@ -38,13 +38,27 @@
     <br/>
     <br/>
    
- 
+{% comment %} <h1 class="display-6 text-center">Form Data: {{vlan_id}} {{ip_network}} {{ cidr }} {{hosts}}</h1>
+</br>
+
+<div class="display-2 container text-center">
+    <div class="row align-items-start">
+        <div class="col bg-secondary">
+         {% for ips in state  %}
+         {{ips}}
+         {% endfor %} 
+        </div>
+    </div>
+</div> {% endcomment %}
+
+
+
+    
 {% endblock SubnetScan %}
 
 
-{% comment %} 
 {% block content %}
-{% if state %} {% comment "" %} coditional display of scan results 
+{% if state %} {% comment "" %} coditional display of scan results {% endcomment %}
     <br/>
     <h1 class="display-4 text-center">Scan results:</h1>
     <form action="{% url "subnet_scan" %}" method="post">
@@ -105,5 +119,4 @@
     {% endfor %}
 {% endif %}
 
-{% endblock content %}  
-{% endcomment %}
+{% endblock content %} 
